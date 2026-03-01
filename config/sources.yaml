@@ -1,0 +1,27 @@
+timezone: "Asia/Colombo"
+
+rss_sources:
+  - name: "BBC News"
+    url: "https://feeds.bbci.co.uk/news/rss.xml"
+  - name: "The Guardian World"
+    url: "https://www.theguardian.com/world/rss"
+  - name: "Sky News - World"
+    url: "https://feeds.skynews.com/feeds/rss/world.xml"
+  - name: "Le Monde - International (EN)"
+    url: "https://www.lemonde.fr/en/international/rss_full.xml"
+  - name: "NPR - World"
+    url: "https://feeds.npr.org/1004/rss.xml"
+
+# Optional JSON APIs (examples)
+api_sources:
+  # Example: NewsAPI.org (requires API key)
+  - name: "NewsAPI Top Headlines"
+    type: "newsapi"
+    enabled: false
+    url: "https://newsapi.org/v2/top-headlines"
+    params:
+      language: "en"
+      pageSize: 50
+    headers:
+      # Put your key in env var NEWSAPI_KEY; code will inject it.
+      X-Api-Key: "${ENV:NEWSAPI_KEY}"
