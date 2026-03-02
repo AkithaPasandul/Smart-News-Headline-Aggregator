@@ -10,6 +10,7 @@ import pandas as pd
 import streamlit as st
 
 from news.sentiment import add_vader_sentiment
+from news.main import run_once_from_dashboard
 
 DATA_LATEST = Path("data/latest_headlines.csv")
 RUNS_DIR = Path("data/runs")
@@ -115,6 +116,21 @@ def trending_today_vs_last7(today_df: pd.DataFrame, snapshot_paths: List[Path], 
 def app():
     st.set_page_config(page_title="Smart News Dashboard", layout="wide")
     st.title("🗞️ Smart News Headline Aggregator Dashboard")
+    
+    # ---- Refresh controls ----
+    st.sidebar.header("Actions")
+    kw_input = st.sidebar.text_input("Refresh keywords (optional)", value="").strip()
+    kw_list = [k for k in kw_input.split() if k] if kw_input else None
+    
+    if st.sidebar.button("🔄 Refresh News Now"):
+        with st.spinner("Fetching & processing news..."):
+            try:
+                result = run_once_from_dashboard(keywords=kw_list)
+                st.sidebar.success("Updated! Reloading dashboard...")
+                st.session_state["last_refresh_result"] = result
+                st.rerun()  # reload UI with new data
+            except Exception as e:
+                st.sidebar.error(f"Refresh failed: {e}")
 
     # ---- Live refresh controls ----
     st.sidebar.header("Live Refresh")

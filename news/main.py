@@ -80,6 +80,16 @@ def build_and_save_digest(
 
     return {"run_record_path": run_record_path, **run_record}
 
+def run_once_from_dashboard(keywords: Optional[List[str]] = None, config_path: str = "config/sources.yaml",) -> Dict[str, Any]:
+    """
+    Safe entry for Streamlit to trigger a refresh.
+    Returns run metadata and output paths.
+    """
+    return build_and_save_digest(
+        config_path=config_path,
+        keywords=keywords,
+    )
+
 
 def main():
     setup_logging("logs/app.log")
