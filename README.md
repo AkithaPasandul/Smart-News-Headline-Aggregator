@@ -1,93 +1,305 @@
-# Smart News Headline Aggregator
+# 🗞️ Smart News Headline Aggregator
 
-Fetches headlines from multiple RSS + optional JSON APIs, deduplicates, filters, categorizes, removes clickbait, and generates a daily digest (TXT/MD/HTML). Includes daily scheduling at 07:00.
+A production-ready Python application that fetches headlines from multiple news sources (RSS + APIs), cleans and deduplicates them, filters intelligently, performs sentiment analysis, detects trending keywords, and generates a daily digest with an interactive dashboard.
 
-## Requirements
-- Python 3.10+
+---
 
-## Setup
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
+## 🚀 Features
 
-pip install -r requirements.txt
+### 📰 Data Collection
+- Fetches headlines from 5+ RSS sources
+- Supports JSON News APIs (optional)
+- Extracts:
+  - Title
+  - Source
+  - Published date
+  - Summary
+  - Link
+- Network retry + timeout handling
+
+---
+
+### 🧠 Intelligent Processing
+- Converts to structured pandas DataFrame
+- Date normalization
+- Exact + near-duplicate removal
+- Keyword filtering
+- Clickbait detection (rule-based)
+- Topic categorization
+- Relevance scoring
+
+---
+
+### 😊 Sentiment Analysis
+- VADER sentiment scoring
+- Compound score (-1 to +1)
+- Labels:
+  - Positive
+  - Neutral
+  - Negative
+- Sentiment charts in dashboard
+
+---
+
+### 📈 Trending Keyword Detection
+- Compares today's keywords vs last 7 runs
+- Calculates:
+  - today_count
+  - previous average
+  - delta (trend direction)
+
+---
+
+### 📅 Daily Digest Output
+Generated in:
+- TXT
+- Markdown
+- Email-ready HTML
+
+Example:
+
+```
+
+📅 Daily News Digest – 2026-03-01
+
+🔹 Technology
+
+* AI breakthrough announced (BBC)
+
+🔹 Business
+
+* Global markets rally (Reuters)
+
+```
+
+---
+
+### 📊 Interactive Streamlit Dashboard
+- Live auto-refresh (configurable minutes)
+- Filter by:
+  - Category
+  - Source
+  - Sentiment
+  - Keyword
+- Sentiment distribution chart
+- Trending keyword table
+- Headline explorer with quick reader
+- Auto-loads latest processed data
+
+---
+
+### ⏰ Automation
+- Scheduled daily run at 07:00 (configurable)
+- Logs stored locally
+- Per-run snapshot stored
+- Run metadata saved as JSON
+
+---
+
+## 📂 Project Structure
+
+```
+
+smart-news-headline-aggregator/
+│
+├── news/
+│   ├── **init**.py
+│   ├── fetcher.py
+│   ├── processor.py
+│   ├── summarizer.py
+│   ├── scheduler.py
+│   ├── sentiment.py
+│   ├── dashboard.py
+│   └── main.py
+│
+├── config/
+│   └── sources.yaml
+│
+├── data/
+│   ├── latest_headlines.csv
+│   └── runs/
+│
+├── outputs/
+├── logs/
+├── pyproject.toml
+├── requirements.txt
+└── README.md
+
 ````
 
-## Run once (today-only)
+---
+
+## 🛠 Installation
+
+### 1️⃣ Clone Repository
+
+```bash
+git clone <your-repo-url>
+cd smart-news-headline-aggregator
+````
+
+---
+
+### 2️⃣ Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate:
+
+**Windows**
+
+```bash
+venv\Scripts\activate
+```
+
+**Mac/Linux**
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+### 3️⃣ Install Dependencies
+
+If using requirements.txt:
+
+```bash
+pip install -r requirements.txt
+```
+
+If using pyproject.toml:
+
+```bash
+pip install -e ".[dashboard]"
+```
+
+---
+
+## ▶ Run the Aggregator (Once)
 
 ```bash
 python -m news.main --once
 ```
 
-With keyword filtering:
+Optional keyword filter:
 
 ```bash
-python -m news.main --once --keywords AI economy
+python -m news.main --once --keywords AI economy sports
 ```
 
-## Run daily at 07:00 (Asia/Colombo)
+Outputs saved to:
+
+```
+outputs/
+data/latest_headlines.csv
+data/runs/
+```
+
+---
+
+## ⏰ Run Daily Scheduled Job
 
 ```bash
 python -m news.main --schedule
 ```
 
-## Outputs
+Runs every day at 07:00 (configured timezone).
 
-* `outputs/digest_YYYY-MM-DD.txt`
-* `outputs/digest_YYYY-MM-DD.md`
-* `outputs/digest_YYYY-MM-DD.html`
+---
 
-## Run history
+## 📊 Run the Dashboard
 
-Each run is stored in:
+```bash
+streamlit run news/dashboard.py
+```
 
-* `data/runs/run_YYYYMMDD_HHMMSS.json`
+Dashboard Features:
 
-## Optional: enable NewsAPI
+* Live auto-refresh (sidebar setting)
+* Sentiment charts
+* Trending keywords (today vs last 7 runs)
+* Headline explorer
+* Quick reader mode
 
-1. Create an API key at NewsAPI.org
+---
+
+## 🔐 Optional: Enable NewsAPI
+
+1. Create API key at [https://newsapi.org](https://newsapi.org)
 2. Set environment variable:
 
-   * Windows (PowerShell): `$env:NEWSAPI_KEY="YOUR_KEY"`
-   * macOS/Linux: `export NEWSAPI_KEY="YOUR_KEY"`
-3. In `config/sources.yaml`, set `enabled: true` for the NewsAPI source.
+**Windows (PowerShell):**
 
+```powershell
+$env:NEWSAPI_KEY="YOUR_KEY"
+```
+
+**Mac/Linux:**
+
+```bash
+export NEWSAPI_KEY="YOUR_KEY"
+```
+
+3. Enable in `config/sources.yaml`
+
+---
+
+## 🧩 Architecture Overview
+
+```
+RSS/API
+   ↓
+Fetcher (retry + timeout)
+   ↓
+Processor
+   - Normalize dates
+   - Deduplicate
+   - Categorize
+   - Score relevance
+   - Filter clickbait
+   ↓
+Sentiment (VADER)
+   ↓
+Summarizer (TXT/MD/HTML)
+   ↓
+Snapshots stored
+   ↓
+Streamlit Dashboard
 ```
 
 ---
 
-## 5) Explanation of each module (quick)
+## 📈 Scalability Roadmap
 
-- **`fetcher.py`**: loads config, fetches RSS and JSON APIs with retries/timeouts, outputs `RawItem` list.
-- **`processor.py`**: converts to DataFrame, normalizes dates, dedupes (exact + near), filters (today + keywords), removes clickbait, categorizes, relevance-scores, sorts.
-- **`summarizer.py`**: builds digest grouped by category; exports TXT/MD/HTML.
-- **`scheduler.py`**: APScheduler cron trigger; stores run metadata.
-- **`main.py`**: CLI entrypoint; run-once or scheduled mode; logging.
+Planned improvements:
+
+* SQLite or PostgreSQL storage
+* MinHash/LSH near-duplicate detection
+* Embedding-based similarity
+* Transformer sentiment model
+* Trend detection by unique dates (last 7 days instead of runs)
+* Docker deployment
+* GitHub Actions CI/CD
+* Email automation
+
+---
+
+## 🧠 Design Principles
+
+* Modular structure
+* Separation of concerns
+* Clean logging
+* Extendable configuration
+* Dashboard-friendly data persistence
+* Production-aware error handling
 
 ---
 
-## 6) Scalability & extendability notes (what to upgrade next)
+## 📜 License
 
-If you plan to scale beyond a few hundred headlines/day:
+MIT License
 
-1) **Faster near-duplicate detection**  
-   Replace `SequenceMatcher` with MinHash/LSH (datasketch) or sentence embeddings + ANN.
-
-2) **Persistent storage**  
-   Add SQLite (or Postgres) to store every headline + hash, enabling “seen before” suppression across days.
-
-3) **Trending keywords**  
-   Daily TF-IDF over titles; keep top movers vs. last 7 days.
-
-4) **Sentiment**  
-   VADER (fast) or transformer sentiment (better, heavier) applied per headline/summary.
-
-5) **Dashboard** (Streamlit)  
-   - Filters: date, category, keyword  
-   - Charts: trending terms, source distribution  
-   - Table: clickable links
-
----
+```
