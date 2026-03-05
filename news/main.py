@@ -11,6 +11,8 @@ from .fetcher import load_config, NewsFetcher
 from .processor import NewsProcessor, ProcessingOptions
 from .summarizer import Summarizer, DigestOptions
 from .scheduler import run_daily, store_run
+from .storage import NewsStore
+from .sentiment import add_vader_sentiment
 
 
 def setup_logging(log_path: str) -> None:
@@ -48,6 +50,13 @@ def build_and_save_digest(
             remove_clickbait=True,
         ),
     )
+    
+    # Add sentiment before saving to DB
+    df = add_vader_sentiment(df)
+
+    # Store into SQLite (persistent storage)
+    store = NewsStore(db_path="data/news.db")
+    store_stats = store.upsert_from_df(df)
 
     # Save latest headlines and run snapshot
     Path("data").mkdir(parents=True, exist_ok=True)
@@ -74,6 +83,8 @@ def build_and_save_digest(
         "kept_items": int(len(df)),
         "outputs": out_paths,
         "headlines_snapshot": run_headlines_path,
+        "db_path": "data/news.db",
+        "db_store": store_stats,
     }
 
     run_record_path = store_run(runs_dir, run_record, tz_name)
