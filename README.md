@@ -1,6 +1,6 @@
 # 🗞️ Smart News Headline Aggregator
 
-A production-ready Python application that fetches headlines from multiple news sources (RSS + APIs), cleans and deduplicates them, filters intelligently, performs sentiment analysis, detects trending keywords, and generates a daily digest with an interactive dashboard.
+A production-ready Python application that fetches headlines from multiple news sources (RSS + APIs), cleans and deduplicates them, filters intelligently, performs sentiment analysis, detects trending keywords and generates a daily digest with an interactive dashboard.
 
 ---
 
@@ -303,3 +303,4 @@ Planned improvements:
 MIT License
 
 ```
+
